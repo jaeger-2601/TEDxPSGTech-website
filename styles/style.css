@@ -5,9 +5,25 @@
 }
 body {
     font-family: 'Poppins', sans-serif;
+    background: black;
 }
+
+
+/* Utility classes */
+
+.bg-grey{
+    background: #323232;
+    color: white;
+}
+
+.bg-black{
+    background: black;
+    color: white;
+}
+
 /* Nav bar */
 header{
+    
     height: 10vh;
     align-items: center;
 }
@@ -15,13 +31,7 @@ header{
     padding-top: 5px;
 }
 
-#imgdesktop{
-    display: block;
-}
 
-#imgmobile{
-    display: none;
-}
 nav{
     display: flex;
     justify-content: space-around;
@@ -30,7 +40,8 @@ nav{
     opacity: 0.8;
     min-height: 8vh;
     width: 100%;
-    position: fixed;
+    position: absolute;
+    z-index: 15;
 }
 
 .nav-links{
@@ -98,13 +109,14 @@ nav .current{
 
 }
 
+
 @media screen and (max-width:1024px)
 {
     .nav-links{
         width: 50%;
     }
 }
-@media screen and (max-width:768px){
+@media screen and (max-width:1920px){
     body{
         overflow-x: hidden;
     }
@@ -119,9 +131,9 @@ nav .current{
 
     nav{
         background-color: black;
-        z-index: 10;
-        
+    
     }
+    
     .nav-links a{
         color: white;
         opacity: 0;
@@ -137,7 +149,7 @@ nav .current{
         display: flex;
         flex-direction: column;
         align-items: center;
-        width: 40%;
+        width: 100%;
         transform: translateX(100%);        
     }
     nav .current{
@@ -151,6 +163,10 @@ nav .current{
 .nav-active{
     transform: translateX(0%);
     transition: transform 0.7s ease;
+}
+
+.nav-deactive{
+    transform: translateX(100%);
 }
 /* 
 */
@@ -178,3 +194,94 @@ nav .current{
 
 
 
+/* Designing the banner */
+.boss img{
+    width: 100%;
+    height: auto;
+}
+.boss {
+    /* background: url('../images/website_landing_fin.png') no-repeat center center/cover; */
+    width: 100%;
+    height: auto;
+    position: relative;
+    background: rgb(255, 69, 69);
+    color: white;
+
+}
+
+
+
+ .boss .button {
+    text-decoration: none;
+    position: absolute;
+    top: 65%;
+    left: 62%;
+    background-color: #555;
+    color: white;
+    font-size: 16px;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+  } 
+
+ .boss .button:hover{
+     background: black;
+     font-weight: bold;
+     font-size: 16px;
+     opacity: 0.8;
+ }
+
+ .theme img{
+
+     width: 100%;
+     height: auto;
+ }
+
+
+ .flex-columns .row{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.flex-columns .column{
+    display: flex;
+    flex-direction: column;
+    flex-basis: 100%;
+    flex: 1;
+}
+
+.flex-columns .column1,
+.flex-columns .column2{
+    height: 100%;
+}
+
+.flex-columns img{
+    height: 100%;
+    width: 100%;
+}
+
+.flex-columns .column2{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 20%;
+}
+
+.flex-columns h2{
+    font-size: 40px;
+    font-weight: 100
+}
+
+.flex-columns p{
+    margin: 100px 0;
+}
+
+.space{
+    width: 100%;
+    height: 8px;
+    background: white;
+}

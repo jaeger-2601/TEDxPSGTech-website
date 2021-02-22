@@ -19,6 +19,9 @@ const navSlide = () => {
         // Burger animation
         burger.classList.toggle('toggle');
     });
+    nav.addEventListener('click',()=>{
+        nav.classList.toggle('nav-deactive');
+    });
 }
 
 navSlide();
