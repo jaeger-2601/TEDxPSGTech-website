@@ -1,21 +1,7 @@
-const myAccessToken = 'MTZjNzVlMmQtZmU1Ni00OTM0LWI5YWMtZDNlMGU3ZjQ1NGIxYTkzZjcwM2MtNjhi_PE93_0413f324-1a07-4840-878a-c3a46d92e693';
 
 // Declare some globals that we'll need throughout
-let activeMeeting, remoteShareStream, webex;
+let activeMeeting, remoteShareStream, remoteVideoStream, webex;
 
-// First, let's wire our form fields up to localStorage so we don't have to
-// retype things everytime we reload the page.
-
-[
-  'access-token',
-].forEach((id) => {
-  const el = document.getElementById(id);
-
-  el.value = localStorage.getItem(id);
-  el.addEventListener('change', (event) => {
-    localStorage.setItem(id, event.target.value);
-  });
-});
 
 // There's a few different events that'll let us know we should initialize
 // Webex and start listening for incoming calls, so we'll wrap a few things
@@ -38,7 +24,7 @@ function connect() {
         },
 
         credentials: {
-          access_token: document.getElementById('access-token').value
+          access_token: 'YmYxZjA1MzUtZDg0Ni00MTQzLTkzOWUtZTllMDIzOTVmOGNjZjk2MjQwY2UtNzdj_PE93_cb22bf91-b84e-4c50-ab49-cd704940b921'
         }
       });
     }
@@ -51,9 +37,10 @@ function connect() {
         // Acknowledge to the server that we received the call on our device
         addedMeeting.acknowledge(addedMeetingEvent.type)
           .then(() => {
-      
+            
               joinMeeting(addedMeeting);
             
+          
           });
       }
     });
@@ -64,7 +51,10 @@ function connect() {
         // Sync our meetings with existing meetings on the server
         .then(() => webex.meetings.syncMeetings())
         .then(() => {
-          document.getElementById('connection-status').innerText = 'connected';
+          // This is just a little helper for our selenium tests and doesn't
+          // really matter for the example
+          document.body.classList.add('listening');
+          
           // Our device is now connected
           resolve();
         })
@@ -96,13 +86,12 @@ function bindMeetingEvents(meeting) {
 
   meeting.on('meeting:startedSharingRemote', () => {
     // Set the source of the video element to the previously stored stream
-    document.getElementById('remote-screen').srcObject = remoteShareStream;
-    document.getElementById('screenshare-tracks-remote').innerText = 'SHARING';
+    document.getElementById('remote-view-video').srcObject = remoteShareStream;
+    
   });
 
   meeting.on('meeting:stoppedSharingRemote', () => {
-    document.getElementById('remote-screen').srcObject = null;
-    document.getElementById('screenshare-tracks-remote').innerText = 'STOPPED';
+    document.getElementById('remote-view-video').srcObject = remoteVideoStream;
   });
 
   // Handle media streams changes to ready state
@@ -114,6 +103,7 @@ function bindMeetingEvents(meeting) {
 
     if (media.type === 'remoteVideo') {
       document.getElementById('remote-view-video').srcObject = media.stream;
+      remoteVideoStream = media.stream;
     }
     if (media.type === 'remoteAudio') {
       document.getElementById('remote-view-audio').srcObject = media.stream;
@@ -122,7 +112,7 @@ function bindMeetingEvents(meeting) {
       // Remote share streams become active immediately on join, even if nothing is being shared
       remoteShareStream = media.stream;
     }
-
+ 
   });
 
   // Handle media streams stopping
@@ -138,8 +128,7 @@ function bindMeetingEvents(meeting) {
 
   });
 
-
-
+  
   // Update participant info
   meeting.members.on('members:update', (delta) => {
     const {full: membersData} = delta;
@@ -152,17 +141,15 @@ function bindMeetingEvents(meeting) {
       // We are not concerned with them in this demo
       if (memberObject.isUser) {
         if (memberObject.isSelf) {
-          document.getElementById('call-status-local').innerText = memberObject.status;
+          console.log('call status local: ' + memberObject.status);
         }
         else {
-          document.getElementById('call-status-remote').innerText = memberObject.status;
+          console.log('call status remote: ' + memberObject.status);
         }
       }
     });
   });
 
-  // Of course, we'd also like to be able to end the meeting:
-  const leaveMeeting = () => meeting.leave();
 
   meeting.on('all', (event) => {
     console.log(event);
@@ -218,17 +205,21 @@ function joinMeeting(meeting) {
       sendShare: false
     };
 
-    return meeting.getMediaStreams(mediaSettings);
+    return meeting.getMediaStreams(mediaSettings).then((mediaStreams) => {
+      const [localStream, localShare] = mediaStreams;
+
+      meeting.addMedia({
+        localShare,
+        localStream,
+        mediaSettings
+      });
+    });
   });
 }
 
 
 
-// Now, let's set up connection handling
-document.getElementById('credentials').addEventListener('submit', (event) => {
-  // let's make sure we don't reload the page when we submit the form
-  event.preventDefault();
+// The rest of the connection setup happens in connect();
+connect();
 
-  // The rest of the connection setup happens in connect();
-  connect();
-});
+
